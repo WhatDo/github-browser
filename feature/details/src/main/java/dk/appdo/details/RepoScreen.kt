@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
@@ -119,7 +120,7 @@ private fun RepoDetailsScreen(
             Column(
                 modifier = Modifier
                     .border(
-                        1.dp,
+                        Dp.Hairline,
                         color = MaterialTheme.colorScheme.outlineVariant,
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -129,17 +130,17 @@ private fun RepoDetailsScreen(
                     name = stringResource(id = R.string.details_forks),
                     value = forks.toString()
                 )
-                Divider()
+                RepoDivider()
                 ItemDetailRow(
                     name = stringResource(id = R.string.details_issues),
                     value = issues.toString()
                 )
-                Divider()
+                RepoDivider()
                 ItemDetailRow(
                     name = stringResource(id = R.string.details_starred_by),
                     value = stars.toString()
                 )
-                Divider()
+                RepoDivider()
                 ItemDetailRow(
                     name = stringResource(id = R.string.details_last_release),
                     value = latestRelease ?: stringResource(id = R.string.details_no_release)
@@ -147,6 +148,11 @@ private fun RepoDetailsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun RepoDivider() {
+    Divider(thickness = Dp.Hairline)
 }
 
 
