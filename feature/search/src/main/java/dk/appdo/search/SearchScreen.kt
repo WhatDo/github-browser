@@ -5,9 +5,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,11 +23,12 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,36 +37,50 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ReportFragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import coil.compose.rememberAsyncImagePainter
+import dk.appdo.models.Repository
 import dk.appdo.resources.R
+import io.ktor.http.Url
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.compose.navigation.koinNavViewModel
 
 @Composable
-fun SearchScreen(vm: SearchViewModel) {
+fun SearchScreen(vm: SearchViewModel = koinNavViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     SearchScreen(
         searchValue = state.query,
         onSearchValueChanged = vm::onSearchValueChanged,
-        results = state.results
+        results = state.results,
+        onRepositorySelected = vm::onRepositorySelected
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun SearchScreen(
     searchValue: String,
     onSearchValueChanged: (String) -> Unit,
-    results: SearchResultsState
+    results: SearchResultsState,
+    onRepositorySelected: (Repository) -> Unit
 ) {
     Scaffold(
         topBar = {
             Column(
                 modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 20.dp)
                     .windowInsetsPadding(
                         WindowInsets.systemBars.only(WindowInsetsSides.Top)
@@ -87,12 +104,28 @@ private fun SearchScreen(
                     modifier = Modifier.padding(innerPadding)
                 )
 
-                SearchResultsState.Error -> ErrorScreen(
-                    modifier = Modifier.padding(innerPadding)
-                )
+                is SearchResultsState.Results -> {
+                    val lazyItems = resultsState.results.collectAsLazyPagingItems()
+                    when (lazyItems.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            LoadingScreen()
+                        }
 
-                SearchResultsState.Loading -> TODO()
-                is SearchResultsState.Results -> TODO()
+                        is LoadState.Error -> {
+                            ErrorScreen(
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+
+                        is LoadState.NotLoading -> {
+                            SearchResultsList(
+                                lazyItems,
+                                onRepositorySelected,
+                                contentPadding = innerPadding
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -145,6 +178,79 @@ private fun SearchBar(
 }
 
 @Composable
+private fun SearchResultsList(
+    items: LazyPagingItems<Repository>,
+    onRepositorySelected: (Repository) -> Unit,
+    contentPadding: PaddingValues
+) {
+    LazyColumn(
+        contentPadding = contentPadding
+    ) {
+        items(items.itemCount) { idx ->
+            val repo = items[idx]
+            if (repo != null) {
+                RepositoryRow(repository = repo, onRepositorySelected = onRepositorySelected)
+            }
+        }
+    }
+}
+
+@Composable
+fun RepositoryRow(
+    repository: Repository,
+    onRepositorySelected: (Repository) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    RepositoryRow(
+        icon = repository.icon,
+        name = repository.name,
+        description = repository.description,
+        onRepositorySelected = { onRepositorySelected(repository) },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun RepositoryRow(
+    icon: Url,
+    name: String,
+    description: String?,
+    onRepositorySelected: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = Modifier
+            .clickable(onClick = onRepositorySelected)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(icon.toString()),
+            contentDescription = null,
+            modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp))
+        )
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (description != null) {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun EmptySearchScreen(modifier: Modifier = Modifier) {
     EmptyContentLayout(
         icon = painterResource(id = R.drawable.ic_empty_folder),
@@ -165,11 +271,40 @@ private fun ErrorScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EmptyContentLayout(
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    EmptyContentLayout(
+        icon = { CircularProgressIndicator() },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EmptyContentLayout(
     icon: Painter,
-    title: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    subtitle: String? = null,
+) {
+    EmptyContentLayout(
+        icon = {
+            Image(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.size(52.dp)
+            )
+        },
+        modifier = modifier,
+        title = title,
+        subtitle = subtitle
+    )
+}
+
+@Composable
+private fun EmptyContentLayout(
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    subtitle: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -177,24 +312,25 @@ private fun EmptyContentLayout(
             .wrapContentSize(Alignment.Center),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = icon,
-            contentDescription = null,
-            modifier = Modifier.size(52.dp)
-        )
+        icon()
         Spacer(modifier = Modifier.size(28.dp))
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.titleSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(200.dp),
-            color = MaterialTheme.colorScheme.secondary
-        )
+        if (title != null) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+
+        if (subtitle != null) {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.titleSmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.width(200.dp),
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
     }
 }

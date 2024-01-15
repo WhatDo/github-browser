@@ -9,4 +9,7 @@ android {
 
 dependencies {
     implementation(project(":common:resources"))
+    implementation(project(":common:repo"))
+
+    implementation(libs.coil)
 }

@@ -29,3 +29,4 @@ include(
 include(":common:models")
 include(":common:navigation")
 include(":common:resources")
+include(":common:repo")

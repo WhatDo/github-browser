@@ -6,6 +6,7 @@ import utils.androidLibrary
 import utils.configureKotlin
 import utils.implementation
 import utils.intValue
+import utils.ksp
 import utils.testImplementation
 import utils.versionCatalog
 
@@ -16,6 +17,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(pluginManager) {
             apply("com.android.library")
             apply("org.jetbrains.kotlin.android")
+            apply("com.google.devtools.ksp")
         }
 
         // Configure Kotlin & Java compilation
@@ -44,6 +46,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             implementation(versionCatalog.findLibrary("kotlinx-coroutines-android").get())
             implementation(versionCatalog.findLibrary("kotlinx-coroutines-core").get())
             implementation(versionCatalog.findLibrary("timber").get())
+
+            implementation(platform(versionCatalog.findLibrary("koin-bom").get()))
+            implementation(versionCatalog.findLibrary("koin-compose").get())
+            implementation(versionCatalog.findLibrary("koin-compose-navigation").get())
+
+            implementation(platform(versionCatalog.findLibrary("koin-annotations-bom").get()))
+            implementation(versionCatalog.findLibrary("koin-annotations").get())
+            ksp(versionCatalog.findLibrary("koin-annotations-ksp").get())
 
             testImplementation(versionCatalog.findLibrary("kotlinx-coroutines-test").get())
             testImplementation(versionCatalog.findLibrary("junit").get())

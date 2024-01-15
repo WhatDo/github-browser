@@ -1,9 +1,11 @@
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrainsKotlinJvm)
+    id("dk.appdo.plugin.lib")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+android {
+    namespace = "dk.appdo.common.models"
+}
+
+dependencies {
+    api(libs.ktor.client.core)
 }

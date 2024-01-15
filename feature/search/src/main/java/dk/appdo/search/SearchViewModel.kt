@@ -1,30 +1,62 @@
 package dk.appdo.search
 
+import androidx.core.text.trimmedLength
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import dk.appdo.models.Repository
+import dk.appdo.repo.GithubRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import org.koin.android.annotation.KoinViewModel
 
-class SearchViewModel : ViewModel() {
+@KoinViewModel
+class SearchViewModel(
+    private val repo: GithubRepository
+) : ViewModel() {
 
     private val query = MutableStateFlow("")
 
+    private val pager = query.map { query ->
+        if (query.trimmedLength() >= MinQueryLength) {
+            SearchResultsState.Results(
+                Pager(
+                    config = PagingConfig(pageSize = 30)
+                ) {
+                    repo.searchRepositories(query)
+                }.flow
+                    .onStart { emit(PagingData.empty()) }
+                    .stateIn(viewModelScope)
+            )
+        } else {
+            SearchResultsState.Idle
+        }
+    }
+
     val state = combine(
         query,
-        flowOf(123)
-    ) { query, _ ->
+        pager
+    ) { query, pager ->
         SearchViewState(
             query = query,
-            results = SearchResultsState.Idle
+            results = pager
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SearchViewState())
 
 
     fun onSearchValueChanged(value: String) {
         query.value = value
+    }
+
+    fun onRepositorySelected(repository: Repository) {
+        TODO("Not yet implemented")
     }
 }
 
@@ -35,9 +67,10 @@ data class SearchViewState(
 
 sealed class SearchResultsState {
     data object Idle : SearchResultsState()
-    data object Loading : SearchResultsState()
-    data object Error : SearchResultsState()
     data class Results(
-        val results: List<String>
+        val results: StateFlow<PagingData<Repository>>
     ) : SearchResultsState()
 }
+
+private const val MinQueryLength = 3
+

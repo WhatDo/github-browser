@@ -7,6 +7,7 @@ import org.gradle.kotlin.dsl.dependencies
 import utils.configureKotlin
 import utils.implementation
 import utils.intValue
+import utils.ksp
 import utils.testImplementation
 import utils.versionCatalog
 import java.io.ByteArrayOutputStream
@@ -18,6 +19,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(pluginManager) {
             apply("com.android.application")
             apply("org.jetbrains.kotlin.android")
+            apply("com.google.devtools.ksp")
         }
 
         // Configure Kotlin & Java compilation
@@ -105,6 +107,14 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             implementation(versionCatalog.findLibrary("androidx-activity-compose").get())
             implementation(versionCatalog.findLibrary("kotlinx-coroutines-android").get())
             implementation(versionCatalog.findLibrary("timber").get())
+
+            implementation(platform(versionCatalog.findLibrary("koin-bom").get()))
+            implementation(versionCatalog.findLibrary("koin-compose").get())
+            implementation(versionCatalog.findLibrary("koin-compose-navigation").get())
+
+            implementation(platform(versionCatalog.findLibrary("koin-annotations-bom").get()))
+            implementation(versionCatalog.findLibrary("koin-annotations").get())
+            ksp(versionCatalog.findLibrary("koin-annotations-ksp").get())
 
             testImplementation(versionCatalog.findLibrary("kotlinx-coroutines-test").get())
             testImplementation(versionCatalog.findLibrary("junit").get())
