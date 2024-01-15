@@ -12,4 +12,6 @@ dependencies {
     implementation(project(":common:repo"))
 
     implementation(libs.coil)
+    implementation(project(":common:navigation"))
+    implementation(project(":common:ui"))
 }

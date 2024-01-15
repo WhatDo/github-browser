@@ -11,12 +11,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class GithubRepositoryResponse(
     val id: Long,
-    val full_name: String,
+    val name: String,
     val description: String?,
-    val owner: Owner
+    val owner: Owner,
+    val forks_count: Int,
+    val open_issues_count: Int,
+    val stargazers_count: Int,
+    val language: String?
 ) {
     @Serializable
     data class Owner(
+        val login: String,
         val avatar_url: String
     )
 }
@@ -24,11 +29,19 @@ internal data class GithubRepositoryResponse(
 internal fun GithubRepositoryResponse.toDomain() = try {
     Repository(
         id = RepoId(id),
-        icon = Url(owner.avatar_url),
-        name = full_name,
-        description = description
+        name = name,
+        description = description,
+        user = Repository.User(
+            name = owner.login,
+            icon = Url(owner.avatar_url)
+        ),
+        language = language,
+        forks = forks_count,
+        issues = open_issues_count,
+        stars = stargazers_count
     )
 } catch (e: URLParserException) {
     // received invalid url, ignore
     null
 }
+

@@ -14,14 +14,16 @@ private val DarkColorScheme = darkColorScheme(
     primary = TextColor,
     secondary = TextColorSecondary,
     tertiary = Pink80,
-    surfaceVariant = SearchField
+    surfaceVariant = SearchField,
+    outlineVariant = Divider
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = TextColor,
     secondary = TextColorSecondary,
     tertiary = Pink40,
-    surfaceVariant = SearchField
+    surfaceVariant = SearchField,
+    outlineVariant = Divider
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

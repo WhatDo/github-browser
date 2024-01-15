@@ -14,21 +14,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,14 +32,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ReportFragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -53,8 +43,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberAsyncImagePainter
 import dk.appdo.models.Repository
 import dk.appdo.resources.R
+import dk.appdo.ui.EmptyContentLayout
+import dk.appdo.ui.ErrorScreen
+import dk.appdo.ui.LoadingScreen
 import io.ktor.http.Url
-import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.compose.navigation.koinNavViewModel
 
 @Composable
@@ -203,7 +195,7 @@ fun RepositoryRow(
 ) {
     RepositoryRow(
         icon = repository.icon,
-        name = repository.name,
+        name = repository.fullName,
         description = repository.description,
         onRepositorySelected = { onRepositorySelected(repository) },
         modifier = modifier
@@ -258,79 +250,4 @@ private fun EmptySearchScreen(modifier: Modifier = Modifier) {
         subtitle = stringResource(id = R.string.search_empty_subtitle),
         modifier = modifier
     )
-}
-
-@Composable
-private fun ErrorScreen(modifier: Modifier = Modifier) {
-    EmptyContentLayout(
-        icon = rememberVectorPainter(image = Icons.Default.Clear),
-        title = stringResource(id = R.string.search_error),
-        subtitle = stringResource(id = R.string.search_error_subtitle),
-        modifier = modifier
-    )
-}
-
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    EmptyContentLayout(
-        icon = { CircularProgressIndicator() },
-        modifier = modifier
-    )
-}
-
-@Composable
-fun EmptyContentLayout(
-    icon: Painter,
-    modifier: Modifier = Modifier,
-    title: String? = null,
-    subtitle: String? = null,
-) {
-    EmptyContentLayout(
-        icon = {
-            Image(
-                painter = icon,
-                contentDescription = null,
-                modifier = Modifier.size(52.dp)
-            )
-        },
-        modifier = modifier,
-        title = title,
-        subtitle = subtitle
-    )
-}
-
-@Composable
-private fun EmptyContentLayout(
-    icon: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    title: String? = null,
-    subtitle: String? = null,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        icon()
-        Spacer(modifier = Modifier.size(28.dp))
-
-        if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-        }
-
-        if (subtitle != null) {
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.width(200.dp),
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
 }

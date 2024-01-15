@@ -6,3 +6,10 @@ plugins {
 android {
     namespace = "dk.appdo.feature.details"
 }
+dependencies {
+    implementation(project(":common:repo"))
+    implementation(project(":common:resources"))
+
+    implementation(libs.coil)
+    implementation(project(":common:ui"))
+}

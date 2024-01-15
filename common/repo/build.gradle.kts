@@ -11,6 +11,7 @@ dependencies {
     api(project(":common:models"))
 
     api(libs.androidx.paging)
+    api(libs.arrow.core)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
