@@ -34,23 +34,23 @@ class ComposeConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                val bom = versionCatalog.findLibrary("compose-bom").get()
+                val bom = versionCatalog.findLibrary("androidx-compose-bom").get()
 
                 implementation(platform(bom))
-                implementation(versionCatalog.findLibrary("ui").get())
-                implementation(versionCatalog.findLibrary("ui-graphics").get())
-                implementation(versionCatalog.findLibrary("ui-tooling-preview").get())
-                implementation(versionCatalog.findLibrary("lifecycle-runtime-ktx").get())
-                implementation(versionCatalog.findLibrary("lifecycle-runtime-compose").get())
-                implementation(versionCatalog.findLibrary("material3").get())
+                implementation(versionCatalog.findLibrary("androidx-ui").get())
+                implementation(versionCatalog.findLibrary("androidx-ui-graphics").get())
+                implementation(versionCatalog.findLibrary("androidx-ui-tooling-preview").get())
+                implementation(versionCatalog.findLibrary("androidx-lifecycle-runtime-ktx").get())
+                implementation(versionCatalog.findLibrary("androidx-lifecycle-runtime-compose").get())
+                implementation(versionCatalog.findLibrary("androidx-material3").get())
                 implementation(versionCatalog.findLibrary("kotlinx-collections-immutable").get())
                 implementation(versionCatalog.findLibrary("androidx-navigation-compose").get())
 
-                debugImplementation(versionCatalog.findLibrary("ui-tooling").get())
-                debugImplementation(versionCatalog.findLibrary("ui-test-manifest").get())
+                debugImplementation(versionCatalog.findLibrary("androidx-ui-tooling").get())
+                debugImplementation(versionCatalog.findLibrary("androidx-ui-test-manifest").get())
 
                 androidTestImplementation(platform(bom))
-                androidTestImplementation(versionCatalog.findLibrary("ui-test-junit4").get())
+                androidTestImplementation(versionCatalog.findLibrary("androidx-ui-test-junit4").get())
             }
         }
     }

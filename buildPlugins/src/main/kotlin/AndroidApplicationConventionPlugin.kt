@@ -24,7 +24,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         configureKotlin(javaVersion = JavaVersion.VERSION_17)
 
         android {
-            compileSdk = versionCatalog.findVersion("androidCompileVersion").intValue
+            compileSdk = versionCatalog.findVersion("androidCompileSdk").intValue
 
 //            signingConfigs {
 //                create("release") {
@@ -102,6 +102,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         }
 
         dependencies {
+            implementation(versionCatalog.findLibrary("androidx-activity-compose").get())
             implementation(versionCatalog.findLibrary("kotlinx-coroutines-android").get())
             implementation(versionCatalog.findLibrary("timber").get())
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_title">Repository library</string>
+    <string name="search_empty">A little empty</string>
+    <string name="search_empty_subtitle">Search for a repository and save it as favourite</string>
+    <string name="search_hint">Search for repository</string>
+    <string name="search_error">Wooooops</string>
+    <string name="search_error_subtitle">Something went wrong with the search!!</string>
+</resources>

@@ -22,3 +22,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "dawn-github-browser"
 include(":app")
+include(
+    ":feature:search",
+    ":feature:details"
+)
+include(":common:models")
+include(":common:navigation")
+include(":common:resources")

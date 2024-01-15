@@ -38,10 +38,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 renderScript = false
                 shaders = false
             }
-
-            compileOptions {
-                isCoreLibraryDesugaringEnabled = true
-            }
         }
 
         dependencies {
