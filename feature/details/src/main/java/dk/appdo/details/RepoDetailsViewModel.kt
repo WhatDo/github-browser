@@ -27,7 +27,7 @@ class RepoDetailsViewModel(
     }
 
     fun refresh() {
-        viewModelScope.launch {
+        viewModelScope.launch() {
             _state.value = RepoDetailsViewState.Loading
             val repository = async { githubRepo.getRepository(user, repo) }
             val latestRelease = async { githubRepo.getLatestRelease(user, repo) }

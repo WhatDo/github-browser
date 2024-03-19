@@ -7,6 +7,7 @@ import dk.appdo.models.Repository
 import io.ktor.http.URLParserException
 import io.ktor.http.Url
 import kotlinx.serialization.Serializable
+import timber.log.Timber
 
 @Serializable
 internal data class GithubRepositoryResponse(

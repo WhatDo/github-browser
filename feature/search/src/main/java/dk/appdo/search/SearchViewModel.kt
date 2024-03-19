@@ -64,6 +64,9 @@ class SearchViewModel(
 
     fun onRepositorySelected(repository: Repository) {
         viewModelScope.launch {
+            // track
+            // navigate
+            // validate
             navManager.navigateTo(
                 Destinations.DETAILS
                     .replace("{user}", repository.user.name)
@@ -87,3 +90,11 @@ sealed class SearchResultsState {
 
 private const val MinQueryLength = 3
 
+
+interface SearchNavigation {
+    fun viewRepoWeb()
+}
+
+class GithubNavgiation
+class GitlabNavgiation
+class BitbucketNavgiation
